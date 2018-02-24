@@ -63,7 +63,7 @@ Data collectData()
 
 String dataToJsonString(const Data& data)
 {
-  return "{\"error\": " + String(data.error) + ", \"id\": " + String(ID) + ", \"timestamp\": " + String(data.time) + ", \"temperature\": " + String(data.temperature) + ", \"humidity\": " + String(data.humidity) + ", \"pressure\": " + String(data.pressure) + ", \"luminosity\": " + String(data.luminosity) + ", \"rain\": " + String(data.rain) + "}";
+  return "{\"e\": " + String(data.error) + ", \"id\": " + String(ID) + ", \"ts\": " + String(data.time) + ", \"t\": " + String(data.temperature) + ", \"h\": " + String(data.humidity) + ", \"p\": " + String(data.pressure) + ", \"l\": " + String(data.luminosity) + ", \"r\": " + String(data.rain) + "}";
 }
 
 String dataToString(const Data& data)
@@ -105,9 +105,9 @@ void loop()
   Serial.println(data.rain);
   Serial.println("-----");
 
-  body = dataToString(data);
+//  body = dataToString(data);
 
-//  body = dataToJsonString(data);
+  body = dataToJsonString(data);
   
 //  StaticJsonBuffer<100> jsonBuffer;
 //  JsonObject& json = jsonBuffer.createObject();
