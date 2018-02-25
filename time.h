@@ -51,6 +51,8 @@ class GSMNTP : public SIM800
 
         sendCmd(TIME);
 
+        time_t dt = millis();
+
         cleanBuffer(buf, sizeof(buf));
         readBuffer(buf, sizeof(buf), 2000);
 
@@ -58,7 +60,9 @@ class GSMNTP : public SIM800
         if (!parseTimeResponse(tm, buf))
           return 0;
 
-        return makeTime(tm);
+        dt = (millis() - dt) / 1000;
+
+        return makeTime(tm) + dt;
       }
 
       bool parseTimeResponse(tmElements_t& tm, const char * buf)
