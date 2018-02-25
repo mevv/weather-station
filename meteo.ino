@@ -6,8 +6,10 @@
 
 //#include <ArduinoJson.h>
 #include <Http.h>
+#include <Sim800.h>
 
 #include "settings.h"
+#include "time.h"
 
 SimpleDHT22 dht22;
 SFE_BMP180 bmp180;
@@ -71,6 +73,15 @@ String dataToString(const Data& data)
   return String(data.error) + "," + String(ID) + "," + String(data.time) + ", " + String(data.temperature) + "," + String(data.humidity) + "," + String(data.pressure) + "," + String(data.luminosity) + "," + String(data.rain);
 }
 
+int getTimestamp()
+{
+  GSMNTP gsmntp(9600, RX_PIN, TX_PIN, RST_PIN, true);
+
+  gsmntp.getTimestamp();
+  
+  return 1;
+}
+
 void setup()
 {
   Wire.begin();
@@ -105,6 +116,8 @@ void loop()
   Serial.println(data.rain);
   Serial.println("-----");
 
+  getTimestamp();
+  
 //  body = dataToString(data);
 
   body = dataToJsonString(data);
@@ -123,25 +136,25 @@ void loop()
 //  
 //  json.printTo(body);
   
-  Serial.println(body);
-  Serial.println(body.c_str());
-  
-  http.connect();
-  
-  Result result = http.post(URL, body.c_str(), response);
-
-  if (result == SUCCESS)
-  {
-    Serial.print("Response: ");
-    Serial.println(response);
-  }
-  else
-  {
-    Serial.print("Error:");
-    Serial.println(result);
-  }
-  
-  http.disconnect();
+//  Serial.println(body);
+//  Serial.println(body.c_str());
+//  
+//  http.connect();
+//  
+//  Result result = http.post(URL, body.c_str(), response);
+//
+//  if (result == SUCCESS)
+//  {
+//    Serial.print("Response: ");
+//    Serial.println(response);
+//  }
+//  else
+//  {
+//    Serial.print("Error:");
+//    Serial.println(result);
+//  }
+//  
+//  http.disconnect();
 
   delay(DELAY);
 }
