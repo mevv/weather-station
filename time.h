@@ -15,23 +15,13 @@
 
 #define BUF 128
 
-
-struct DateTime
-{
-  byte y = 0;
-  byte mm = 0;
-  byte d = 0;
-  byte h = 0;
-  byte m = 0;
-  byte s = 0;
-};
-
 class GSMNTP : public SIM800
 {
   public:
     GSMNTP(unsigned int baudRate, unsigned int rxPin, unsigned int txPin, unsigned int rstPin, bool debug = TRUE):
       SIM800(baudRate, rxPin, txPin, rstPin, debug)
     {
+      setSyncInterval(TIME_SYNC_INTERVAL);
     };
 
     time_t getTimestamp()
@@ -46,7 +36,32 @@ class GSMNTP : public SIM800
     }
 
     private:
-      bool parseTimeResponse(DateTime& dt, const char * buf)
+      time_t getTime()
+      {
+        char buf[128];
+
+        sendCmdAndWaitForResp(CPRS_TYPE, OK, 2000);
+        sendCmdAndWaitForResp(APN, OK, 2000);
+        sendCmdAndWaitForResp(CONTEXT, OK, 2000);
+        sendCmdAndWaitForResp(NTP_PROFILE, OK, 2000);
+        sendCmdAndWaitForResp(NTP_SERVER, OK, 2000);
+
+        if (!sendCmdAndWaitForResp(NTP, OK, 2000))
+          return 0;
+
+        sendCmd(TIME);
+
+        cleanBuffer(buf, sizeof(buf));
+        readBuffer(buf, sizeof(buf), 2000);
+
+        tmElements_t tm;
+        if (!parseTimeResponse(tm, buf))
+          return 0;
+
+        return makeTime(tm);
+      }
+
+      bool parseTimeResponse(tmElements_t& tm, const char * buf)
       {
         char d[20];
         
@@ -63,12 +78,12 @@ class GSMNTP : public SIM800
         
         String date(d);
         
-        dt.y = date.substring(0, 2).toInt();
-        dt.mm = date.substring(3, 5).toInt();
-        dt.d = date.substring(6, 8).toInt();
-        dt.h = date.substring(9, 11).toInt();
-        dt.m = date.substring(12, 14).toInt();
-        dt.s = date.substring(15, 17).toInt();
+        tm.Year = date.substring(0, 2).toInt() + 2000 - 1970;
+        tm.Month = date.substring(3, 5).toInt();
+        tm.Day = date.substring(6, 8).toInt();
+        tm.Hour = date.substring(9, 11).toInt();
+        tm.Minute = date.substring(12, 14).toInt();
+        tm.Second = date.substring(15, 17).toInt();
 
 //        Serial.println(dt.y);
 //        Serial.println(dt.mm);
@@ -82,27 +97,12 @@ class GSMNTP : public SIM800
       
       bool syncTime()
       {
-        char buf[128];
-      
-        sendCmdAndWaitForResp(CPRS_TYPE, OK, 2000);
-        sendCmdAndWaitForResp(APN, OK, 2000);
-        sendCmdAndWaitForResp(CONTEXT, OK, 2000);
-        sendCmdAndWaitForResp(NTP_PROFILE, OK, 2000);
-        sendCmdAndWaitForResp(NTP_SERVER, OK, 2000);
+        time_t t = 0;
         
-        if (!sendCmdAndWaitForResp(NTP, OK, 2000))
+        if (!(t = getTime()))
           return false;
-          
-        sendCmd(TIME);
-        
-        cleanBuffer(buf, sizeof(buf));
-        readBuffer(buf, sizeof(buf), 2000);
 
-        DateTime dt;
-        if (!parseTimeResponse(dt, buf))
-          return false;
-        
-        setTime(dt.h, dt.m, dt.s, dt.d, dt.mm, dt.y);
+        setTime(t);
 
         Serial.println("Time synced, timestamp: " + String(now()));
 

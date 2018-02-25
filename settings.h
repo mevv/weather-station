@@ -5,7 +5,9 @@
 
 #define URL "http://4b45cfbb.ngrok.io/api/json/hello"
 
-#define DELAY 5000
+#define DELAY 5000 // ms
+
+#define TIME_SYNC_INTERVAL 10 // sec
 
 //digital pins
 #define DHT22_PIN  2
