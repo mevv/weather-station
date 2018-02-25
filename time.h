@@ -13,7 +13,7 @@
 #define NTP "AT+CNTP\r\n"
 #define TIME "AT+CCLK?\r\n"
 
-#define BUF 128
+#define BUF 40
 
 class GSMNTP : public SIM800
 {
@@ -38,7 +38,7 @@ class GSMNTP : public SIM800
     private:
       time_t getTime()
       {
-        char buf[64];
+        char buf[BUF];
 
         sendCmdAndWaitForResp(CPRS_TYPE, OK, 2000);
         sendCmdAndWaitForResp(APN, OK, 2000);
@@ -108,7 +108,7 @@ class GSMNTP : public SIM800
 
         setTime(t);
 
-        Serial.println("Time synced, timestamp: " + String(now()));
+        //Serial.println("Time synced, timestamp: " + String(now()));
 
         return true;
       }

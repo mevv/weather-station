@@ -17,7 +17,7 @@ SFE_BMP180 bmp180;
 BH1750 bh1750;
 
 HTTP http(9600, RX_PIN, TX_PIN, RST_PIN, true);
-GSMNTP gsmntp(9600, RX_PIN, TX_PIN, RST_PIN, false);
+GSMNTP gsmntp(9600, RX_PIN, TX_PIN, RST_PIN, true);
 
 struct Data
 {
@@ -100,7 +100,7 @@ void loop()
 {
   Data data;
 
-  char response[32];
+  char response[8];
   String body;
 
   data = collectData();
@@ -118,7 +118,7 @@ void loop()
 //  body = dataToString(data);
 
   body = dataToJsonString(data);
-  
+
 //  StaticJsonBuffer<100> jsonBuffer;
 //  JsonObject& json = jsonBuffer.createObject();
 //  

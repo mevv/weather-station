@@ -3,7 +3,7 @@
 
 #define ID 1
 
-#define URL "http://c0f7e1e1.ngrok.io/api/json/hello"
+#define URL "http://6f8aac49.ngrok.io/api/json/hello"
 
 #define DELAY 5000 // ms
 
