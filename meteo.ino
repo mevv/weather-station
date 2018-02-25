@@ -135,23 +135,23 @@ void loop()
   
 //  Serial.println(body);
 //  Serial.println(body.c_str());
-//  
-//  http.connect();
-//  
-//  Result result = http.post(URL, body.c_str(), response);
-//
-//  if (result == SUCCESS)
-//  {
-//    Serial.print("Response: ");
-//    Serial.println(response);
-//  }
-//  else
-//  {
-//    Serial.print("Error:");
-//    Serial.println(result);
-//  }
-//  
-//  http.disconnect();
+  
+  http.connect();
+  
+  Result result = http.post(URL, body.c_str(), response);
+
+  if (result == SUCCESS)
+  {
+    Serial.print("Response: ");
+    Serial.println(response);
+  }
+  else
+  {
+    Serial.print("Error:");
+    Serial.println(result);
+  }
+  
+  http.disconnect();
 
   delay(DELAY);
 }
