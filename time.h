@@ -106,6 +106,9 @@ class GSMNTP : public SIM800
         if (!(t = getTime()))
           return false;
 
+        if (t < MIN_TIMESTAMP)
+          return false;
+
         setTime(t);
 
         //Serial.println("Time synced, timestamp: " + String(now()));
