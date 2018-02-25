@@ -8,6 +8,7 @@
 #include <Http.h>
 #include <Sim800.h>
 
+#include "error.h"
 #include "settings.h"
 #include "time.h"
 
@@ -16,11 +17,12 @@ SFE_BMP180 bmp180;
 BH1750 bh1750;
 
 HTTP http(9600, RX_PIN, TX_PIN, RST_PIN, true);
+GSMNTP gsmntp(9600, RX_PIN, TX_PIN, RST_PIN, false);
 
 struct Data
 {
   byte error = 0;
-  int time = 0;
+  time_t ts = 0;
   byte temperature = 0;
   byte humidity = 0;
   word pressure = 0;
@@ -34,13 +36,18 @@ Data collectData()
   
   byte temperature = 0;
   byte humidity = 0;
-  int err = SimpleDHTErrSuccess;
-
-  if ((err = dht22.read(DHT22_PIN, &result.temperature, &result.humidity, NULL)) != SimpleDHTErrSuccess)
-    result.error = err;
-
   char status;
   double T, P;
+  int err = SimpleDHTErrSuccess;
+  time_t timestamp = 0;
+  
+  if (!(timestamp = gsmntp.getTimestamp()))
+    result.error = TIME_SYNC_ERROR;
+  
+  result.ts = timestamp;
+  
+  if ((err = dht22.read(DHT22_PIN, &result.temperature, &result.humidity, NULL)) != SimpleDHTErrSuccess)
+    result.error = err;
 
   status = bmp180.startTemperature();
   if (!status)
@@ -65,21 +72,12 @@ Data collectData()
 
 String dataToJsonString(const Data& data)
 {
-  return "{\"e\": " + String(data.error) + ", \"id\": " + String(ID) + ", \"ts\": " + String(data.time) + ", \"t\": " + String(data.temperature) + ", \"h\": " + String(data.humidity) + ", \"p\": " + String(data.pressure) + ", \"l\": " + String(data.luminosity) + ", \"r\": " + String(data.rain) + "}";
+  return "{\"e\": " + String(data.error) + ", \"id\": " + String(ID) + ", \"ts\": " + String(data.ts) + ", \"t\": " + String(data.temperature) + ", \"h\": " + String(data.humidity) + ", \"p\": " + String(data.pressure) + ", \"l\": " + String(data.luminosity) + ", \"r\": " + String(data.rain) + "}";
 }
 
 String dataToString(const Data& data)
 {
-  return String(data.error) + "," + String(ID) + "," + String(data.time) + ", " + String(data.temperature) + "," + String(data.humidity) + "," + String(data.pressure) + "," + String(data.luminosity) + "," + String(data.rain);
-}
-
-int getTimestamp()
-{
-  GSMNTP gsmntp(9600, RX_PIN, TX_PIN, RST_PIN, true);
-
-  gsmntp.getTimestamp();
-  
-  return 1;
+  return String(data.error) + "," + String(ID) + "," + String(data.ts) + ", " + String(data.temperature) + "," + String(data.humidity) + "," + String(data.pressure) + "," + String(data.luminosity) + "," + String(data.rain);
 }
 
 void setup()
@@ -109,14 +107,13 @@ void loop()
 
   Serial.println("-----");
   Serial.println(data.error);
+  Serial.println(data.ts);
   Serial.println(data.temperature);
   Serial.println(data.humidity);
   Serial.println(data.pressure);
   Serial.println(data.luminosity);
   Serial.println(data.rain);
   Serial.println("-----");
-
-  getTimestamp();
   
 //  body = dataToString(data);
 
