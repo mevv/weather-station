@@ -100,7 +100,7 @@ void loop()
 {
   Data data;
 
-  char response[128];
+  char response[32];
   String body;
 
   data = collectData();

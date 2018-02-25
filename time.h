@@ -38,7 +38,7 @@ class GSMNTP : public SIM800
     private:
       time_t getTime()
       {
-        char buf[128];
+        char buf[64];
 
         sendCmdAndWaitForResp(CPRS_TYPE, OK, 2000);
         sendCmdAndWaitForResp(APN, OK, 2000);
@@ -67,20 +67,18 @@ class GSMNTP : public SIM800
 
       bool parseTimeResponse(tmElements_t& tm, const char * buf)
       {
-        char d[20];
+        String date;
         
         for (int i = 0; i < BUF && buf[i] != '\0'; i++)
         {
           if (buf[i] == '"')
           {
             i++;
-            for (int j = 0; j < 20; j++)
-              d[j] = buf[i++];
+            for (int j = 0; buf[i] != '"' &&  buf[i] != '\0'; j++)
+              date += buf[i++];
             break;
           }
         }
-        
-        String date(d);
         
         tm.Year = date.substring(0, 2).toInt() + 2000 - 1970;
         tm.Month = date.substring(3, 5).toInt();
@@ -89,12 +87,14 @@ class GSMNTP : public SIM800
         tm.Minute = date.substring(12, 14).toInt();
         tm.Second = date.substring(15, 17).toInt();
 
-//        Serial.println(dt.y);
-//        Serial.println(dt.mm);
-//        Serial.println(dt.d);
-//        Serial.println(dt.h);
-//        Serial.println(dt.m);
-//        Serial.println(dt.s);
+//        Serial.println(date);
+//
+//        Serial.println(tm.Year);
+//        Serial.println(tm.Month);
+//        Serial.println(tm.Day);
+//        Serial.println(tm.Hour);
+//        Serial.println(tm.Minute);
+//        Serial.println(tm.Second);
 
         return true;
       }
