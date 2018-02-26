@@ -89,7 +89,7 @@ void setup()
   if (!bmp180.begin())
     return;
 
-  Serial.println(http.configureBearer("internet"));
+  Serial.println(http.configureBearer(APN));
   
   analogReference(EXTERNAL);
   
