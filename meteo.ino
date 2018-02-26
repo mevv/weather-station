@@ -1,10 +1,9 @@
+//#include <ArduinoJson.h>
 #include <Wire.h>
 
 #include <SimpleDHT.h>
 #include <SFE_BMP180.h>
 #include <BH1750.h>
-
-//#include <ArduinoJson.h>
 #include <Http.h>
 #include <Sim800.h>
 
@@ -34,12 +33,11 @@ Data collectData()
 {
   Data result;
   
-  byte temperature = 0;
-  byte humidity = 0;
-  char status;
-  double T, P;
-  int err = SimpleDHTErrSuccess;
+  byte status;
+  int err = 0;
   time_t timestamp = 0;
+  double T = 0.0;
+  double P = 0.0;
   
   if (!(timestamp = gsmntp.getTimestamp()))
     result.error = TIME_SYNC_ERROR;
@@ -73,11 +71,6 @@ Data collectData()
 String dataToJsonString(const Data& data)
 {
   return "{\"e\": " + String(data.error) + ", \"id\": " + String(ID) + ", \"ts\": " + String(data.ts) + ", \"t\": " + String(data.temperature) + ", \"h\": " + String(data.humidity) + ", \"p\": " + String(data.pressure) + ", \"l\": " + String(data.luminosity) + ", \"r\": " + String(data.rain) + "}";
-}
-
-String dataToString(const Data& data)
-{
-  return String(data.error) + "," + String(ID) + "," + String(data.ts) + ", " + String(data.temperature) + "," + String(data.humidity) + "," + String(data.pressure) + "," + String(data.luminosity) + "," + String(data.rain);
 }
 
 void setup()
