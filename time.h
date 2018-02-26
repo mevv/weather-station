@@ -6,7 +6,7 @@
 #define OK "OK\r\n"
 
 #define CPRS_TYPE "AT+SAPBR=3,1, \"Contype\",\"GPRS\"\r\n"
-#define APN "AT+SAPBR=3,1, \"APN\",\"internet\"\r\n"
+#define SET_APN "AT+SAPBR=3,1, \"APN\",\"internet\"\r\n"
 #define CONTEXT "AT+SAPBR=1,1\r\n"
 #define NTP_PROFILE "AT+CNTPCID=1\r\n"
 #define NTP_SERVER "AT+CNTP=\"time.google.com\",0\r\n"
@@ -41,7 +41,7 @@ class GSMNTP : public SIM800
         char buf[BUF];
 
         sendCmdAndWaitForResp(CPRS_TYPE, OK, 2000);
-        sendCmdAndWaitForResp(APN, OK, 2000);
+        sendCmdAndWaitForResp(SET_APN, OK, 2000);
         sendCmdAndWaitForResp(CONTEXT, OK, 2000);
         sendCmdAndWaitForResp(NTP_PROFILE, OK, 2000);
         sendCmdAndWaitForResp(NTP_SERVER, OK, 2000);
