@@ -1,5 +1,7 @@
 //#include <ArduinoJson.h>
 #include <Wire.h>
+#include <SoftwareSerial.h>
+
 
 #include <SimpleDHT.h>
 #include <SFE_BMP180.h>
@@ -75,7 +77,7 @@ String dataToJsonString(const Data& data)
 
 void setup()
 {
-  Wire.begin();
+  //Wire.begin();
   Serial.begin(9600);
   bh1750.begin();
 
