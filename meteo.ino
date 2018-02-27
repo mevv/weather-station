@@ -34,28 +34,28 @@ Data collectData()
   Data result;
   
   byte status;
-  int err = 0;
-  time_t timestamp = 0;
+  byte err = 0;
   double T = 0.0;
   double P = 0.0;
   
-  if (!(timestamp = gsmntp.getTimestamp()))
+  if (!(result.ts = gsmntp.getTimestamp()))
     result.error = TIME_SYNC_ERROR;
   
-  result.ts = timestamp;
-  
   if ((err = dht22.read(DHT22_PIN, &result.temperature, &result.humidity, NULL)) != SimpleDHTErrSuccess)
-    result.error = err;
+    if (!result.error)
+      result.error = err;
 
   status = bmp180.startTemperature();
   if (!status)
-    result.error = 1;
+    if (!result.error)
+      result.error = bmp180.getError();
   delay(status);
   status = bmp180.getTemperature(T);
 
   status = bmp180.startPressure(PRESSURE_RESOLUTION);
   if (!status)
-    result.error = 1;
+    if (!result.error)
+      result.error = bmp180.getError();
   delay(status);
   status = bmp180.getPressure(P, T);
 
@@ -75,11 +75,12 @@ String dataToJsonString(const Data& data)
 
 void setup()
 {
-  //Wire.begin();
   Serial.begin(9600);
-  bh1750.begin();
 
   if (!bmp180.begin())
+    return;
+
+  if (!bh1750.begin())
     return;
 
   Serial.println(http.configureBearer(APN));
