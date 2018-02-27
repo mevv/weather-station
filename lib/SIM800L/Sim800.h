@@ -50,7 +50,7 @@ public:
      *  @param rxPin uart receive pin to communicate with SIM800
      *  @param txPin uart transmit pin to communicate with SIM800
      */
-    SIM800(unsigned int baudRate, unsigned int rxPin, unsigned int txPin, unsigned int rstPin, bool debug):serialSIM800(txPin, rxPin) {
+    SIM800(unsigned int baudRate, uint8_t rxPin, uint8_t txPin, uint8_t rstPin, bool debug):serialSIM800(txPin, rxPin) {
         serialSIM800.begin(baudRate);
         debugMode = debug;
         resetPin = rstPin;
@@ -124,7 +124,7 @@ private:
 
     SoftwareSerial serialSIM800;
     bool debugMode;
-    unsigned int resetPin;
+    uint8_t resetPin;
 
 };
 

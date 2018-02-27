@@ -1,7 +1,5 @@
-//#include <ArduinoJson.h>
 #include <Wire.h>
 #include <SoftwareSerial.h>
-
 
 #include <SimpleDHT.h>
 #include <SFE_BMP180.h>
