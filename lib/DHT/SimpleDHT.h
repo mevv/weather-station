@@ -55,10 +55,10 @@ public:
     // @param pdata output 40bits sample, NULL to ignore.
     // @remark the min delay for this method is 1s(DHT11) or 2s(DHT22).
     // @return SimpleDHTErrSuccess is success; otherwise, failed.
-    virtual int read(int pin, byte* ptemperature, byte* phumidity, byte pdata[40]);
+    int read(int pin, byte* ptemperature, byte* phumidity, byte pdata[40]);
     // to get a more accurate data.
     // @remark it's available for dht22. for dht11, it's the same of read().
-    virtual int read2(int pin, float* ptemperature, float* phumidity, byte pdata[40]) = 0;
+    int read2(int pin, float* ptemperature, float* phumidity, byte pdata[40]);
 protected:
     // confirm the OUTPUT is level in us, 
     // for example, when DHT11 start sample, it will
@@ -68,67 +68,19 @@ protected:
     // @remark should never used to read bits, 
     //    for function call use more time, maybe never got bit0.
     // @remark please use simple_dht11_read().
-    virtual int confirm(int pin, int us, byte level);
+    int confirm(int pin, int us, byte level);
     // @data the bits of a byte.
     // @remark please use simple_dht11_read().
-    virtual byte bits2byte(byte data[8]);
+    byte bits2byte(byte data[8]);
     // read temperature and humidity from dht11.
     // @param pin the pin for DHT11, for example, 2.
     // @param data a byte[40] to read bits to 5bytes.
     // @return 0 success; otherwise, error.
     // @remark please use simple_dht11_read().
-    virtual int sample(int pin, byte data[40]) = 0;
+    int sample(int pin, byte data[40]);
     // parse the 40bits data to temperature and humidity.
     // @remark please use simple_dht11_read().
-    virtual int parse(byte data[40], short* ptemperature, short* phumidity);
-};
-
-/*
-    Simple DHT11
-
-    Simple, Stable and Fast DHT11 library.
-
-    The circuit:
-    * VCC: 5V or 3V
-    * GND: GND
-    * DATA: Digital ping, for instance 2.
-
-    23 Jan 2016 By winlin <winlin@vip.126.com>
-
-    https://github.com/winlinvip/SimpleDHT#usage
-    https://akizukidenshi.com/download/ds/aosong/DHT11.pdf
-    https://cdn-shop.adafruit.com/datasheets/DHT11-chinese.pdf
-
-*/
-class SimpleDHT11 : public SimpleDHT {
-public:
-    virtual int read2(int pin, float* ptemperature, float* phumidity, byte pdata[40]);
-protected:
-    virtual int sample(int pin, byte data[40]);
-};
-
-/*
-    Simple DHT11
-
-    Simple, Stable and Fast DHT11 library.
-
-    The circuit:
-    * VCC: 5V or 3V
-    * GND: GND
-    * DATA: Digital ping, for instance 2.
-
-    3 Jun 2017 By winlin <winlin@vip.126.com>
-
-    https://github.com/winlinvip/SimpleDHT#usage
-    http://akizukidenshi.com/download/ds/aosong/AM2302.pdf
-    https://cdn-shop.adafruit.com/datasheets/DHT22.pdf
-
-*/
-class SimpleDHT22 : public SimpleDHT {
-public:
-    virtual int read2(int pin, float* ptemperature, float* phumidity, byte pdata[40]);
-protected:
-    virtual int sample(int pin, byte data[40]);
+    int parse(byte data[40], short* ptemperature, short* phumidity);
 };
 
 #endif

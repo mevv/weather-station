@@ -26,6 +26,9 @@
 // 3 = Received NACK on transmit of data
 // 4 = Other error
 
-#define TIME_SYNC_ERROR 201
+#define DHT22_ERROR 0x01
+#define BMP180_ERROR 0x02
+#define BH1750_ERROR 0x04
+#define TIME_SYNC_ERROR 0x08
 
 #endif

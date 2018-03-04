@@ -91,100 +91,7 @@ int SimpleDHT::parse(byte data[40], short* ptemperature, short* phumidity) {
     return SimpleDHTErrSuccess;
 }
 
-int SimpleDHT11::read2(int pin, float* ptemperature, float* phumidity, byte pdata[40]) {
-    int ret = SimpleDHTErrSuccess;
-
-    byte data[40] = {0};
-    if ((ret = sample(pin, data)) != SimpleDHTErrSuccess) {
-        return ret;
-    }
-
-    short temperature = 0;
-    short humidity = 0;
-    if ((ret = parse(data, &temperature, &humidity)) != SimpleDHTErrSuccess) {
-        return ret;
-    }
-
-    if (pdata) {
-        memcpy(pdata, data, 40);
-    }
-    if (ptemperature) {
-        *ptemperature = (int)(temperature>>8);
-    }
-    if (phumidity) {
-        *phumidity = (int)(humidity>>8);
-    }
-
-    // For example, when remove the data line, it will be success with zero data.
-    if (temperature == 0 && humidity == 0) {
-        return SimpleDHTErrZeroSamples;
-    }
-
-    return ret;
-}
-
-int SimpleDHT11::sample(int pin, byte data[40]) {
-    // empty output data.
-    memset(data, 0, 40);
-
-    // According to protocol: https://akizukidenshi.com/download/ds/aosong/DHT11.pdf
-    // notify DHT11 to start:
-    //    1. PULL LOW 20ms.
-    //    2. PULL HIGH 20-40us.
-    //    3. SET TO INPUT.
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, LOW);
-    delay(20);
-    digitalWrite(pin, HIGH);
-    pinMode(pin, INPUT);
-    delayMicroseconds(30);
-    // DHT11 starting:
-    //    1. PULL LOW 80us
-    //    2. PULL HIGH 80us
-    if (confirm(pin, 80, LOW)) {
-        return SimpleDHTErrStartLow;
-    }
-    if (confirm(pin, 80, HIGH)) {
-        return SimpleDHTErrStartHigh;
-    }
-
-    // DHT11 data transmite:
-    //    1. 1bit start, PULL LOW 50us
-    //    2. PULL HIGH 26-28us, bit(0)
-    //    3. PULL HIGH 70us, bit(1)
-    for (int j = 0; j < 40; j++) {
-        if (confirm(pin, 50, LOW)) {
-            return SimpleDHTErrDataLow;
-        }
-
-        // read a bit, should never call method,
-        // for the method call use more than 20us,
-        // so it maybe failed to detect the bit0.
-        bool ok = false;
-        int tick = 0;
-        for (int i = 0; i < 8; i++, tick++) {
-            if (digitalRead(pin) != HIGH) {
-                ok = true;
-                break;
-            }
-            delayMicroseconds(10);
-        }
-        if (!ok) {
-            return SimpleDHTErrDataRead;
-        }
-        data[j] = (tick > 3? 1:0);
-    }
-
-    // DHT11 EOF:
-    //    1. PULL LOW 50us.
-    if (confirm(pin, 50, LOW)) {
-        return SimpleDHTErrDataEOF;
-    }
-
-    return SimpleDHTErrSuccess;
-}
-
-int SimpleDHT22::read2(int pin, float* ptemperature, float* phumidity, byte pdata[40]) {
+int SimpleDHT::read2(int pin, float* ptemperature, float* phumidity, byte pdata[40]) {
     int ret = SimpleDHTErrSuccess;
 
     byte data[40] = {0};
@@ -211,12 +118,12 @@ int SimpleDHT22::read2(int pin, float* ptemperature, float* phumidity, byte pdat
     return ret;
 }
 
-int SimpleDHT22::sample(int pin, byte data[40]) {
+int SimpleDHT::sample(int pin, byte data[40]) {
     // empty output data.
     memset(data, 0, 40);
 
     // According to protocol: http://akizukidenshi.com/download/ds/aosong/AM2302.pdf
-    // notify DHT11 to start: 
+    // notify DHT11 to start:
     //    1. T(be), PULL LOW 1ms(0.8-20ms).
     //    2. T(go), PULL HIGH 30us(20-200us), use 40us.
     //    3. SET TO INPUT.

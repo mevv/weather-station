@@ -11,7 +11,7 @@
 #include "settings.h"
 #include "time.h"
 
-SimpleDHT22 dht22;
+SimpleDHT dht22;
 SFE_BMP180 bmp180;
 BH1750 bh1750;
 
