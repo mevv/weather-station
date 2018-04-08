@@ -1,4 +1,5 @@
 Warning!
+
 We use alternative(forked) versions of following external libs, here links for orginal ones:
 ArduinoSIM800L(https://github.com/carrascoacd/ArduinoSIM800L) - HTTP client library for Arduino and SIM800L (SIM800) board to perform GET and POST requests to a JSON API
 SimpleDHT(https://github.com/winlinvip/SimpleDHT) - Simple, Stable and Fast Arduino Temp & Humidity Sensors for DHT11 and DHT22.

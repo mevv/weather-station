@@ -2,7 +2,7 @@
 
 ARDUINO_DIR = $(HOME)/arduino-1.8.5
 ARDMK_DIR = $(HOME)/source/arduino/Arduino-Makefile
-AVR_TOOLS_DIR = /home/valera/arduino-1.8.5/hardware/tools/avr
+AVR_TOOLS_DIR = $(HOME)/arduino-1.8.5/hardware/tools/avr
 
 BOARDS_TXT = ./boards.txt
 
