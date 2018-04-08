@@ -1,12 +1,15 @@
 # Arduino Make file https://github.com/sudar/Arduino-Makefile
 
-ARDUINO_DIR = /home/valera/Downloads/arduino-1.8.5
-ARDMK_DIR = /home/valera/Desktop/arduino/Arduino-Makefile
-AVR_TOOLS_DIR = /home/valera/Downloads/arduino-1.8.5/hardware/tools/avr
+ARDUINO_DIR = $(HOME)/arduino-1.8.5
+ARDMK_DIR = $(HOME)/source/arduino/Arduino-Makefile
+AVR_TOOLS_DIR = /home/valera/arduino-1.8.5/hardware/tools/avr
 
-USER_LIB_PATH = /home/valera/Desktop/arduino/ArduinoIDE/meteo/lib
+BOARDS_TXT = ./boards.txt
+
+USER_LIB_PATH = ./lib
 ARDUINO_LIBS = SIM800L BH1750 BMP180 DHT Time SoftwareSerial Wire
 
 BOARD_TAG = nano
+#BOARD_SUB = atmega328
 
-include /home/valera/Desktop/arduino/Arduino-Makefile/Arduino.mk
+include $(HOME)/source/arduino/Arduino-Makefile/Arduino.mk
