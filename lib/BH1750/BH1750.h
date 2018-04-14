@@ -16,7 +16,11 @@
 #ifndef BH1750_h
 #define BH1750_h
 
-#include <Arduino.h>
+#if (ARDUINO >= 100)
+  #include <Arduino.h>
+#else
+  #include <WProgram.h>
+#endif
 
 #include "Wire.h"
 
@@ -59,7 +63,7 @@ class BH1750 {
     uint16_t readLightLevel(bool maxWait = false);
 
   private:
-    uint8_t BH1750_I2CADDR;
+    int BH1750_I2CADDR;
     Mode BH1750_MODE = UNCONFIGURED;
 
 };

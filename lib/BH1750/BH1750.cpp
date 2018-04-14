@@ -50,7 +50,7 @@
  *
  * On most sensor boards, it was 0x76
  */
-BH1750::BH1750(uint8_t addr) {
+BH1750::BH1750(byte addr) {
 
   BH1750_I2CADDR = addr;
 
@@ -78,7 +78,7 @@ bool BH1750::begin(Mode mode) {
 bool BH1750::configure(Mode mode) {
 
   // default transmission result to a value out of normal range
-  uint8_t ack = 5;
+  byte ack = 5;
 
   // Check measurement mode is valid
   switch (mode) {
