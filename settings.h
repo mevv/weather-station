@@ -3,9 +3,9 @@
 
 #define ID 1
 
-#define URL "http://6f8aac49.ngrok.io/api/json/hello"
+#define URL "http://webhook.site/a5b0af74-c7de-456e-94c6-c442e31717fb"
 
-#define DELAY 5000 // ms
+#define DELAY 60000 // ms
 
 #define TIME_SYNC_INTERVAL 10 // sec
 

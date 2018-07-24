@@ -11,6 +11,10 @@
 #include "settings.h"
 #include "time.h"
 
+#ifdef MEMORY
+#include <MemoryFree.h>
+#endif
+
 SimpleDHT dht22;
 SFE_BMP180 bmp180;
 BH1750 bh1750;
@@ -73,6 +77,28 @@ String dataToJsonString(const Data& data)
   return "{\"e\": " + String(data.error) + ", \"id\": " + String(ID) + ", \"ts\": " + String(data.ts) + ", \"t\": " + String(data.temperature) + ", \"h\": " + String(data.humidity) + ", \"p\": " + String(data.pressure) + ", \"l\": " + String(data.luminosity) + ", \"r\": " + String(data.rain) + "}";
 }
 
+#ifdef MEMORY
+void printFreeMem()
+{
+    Serial.println(String("Memory:" + String(freeMemory())));
+}
+#endif
+
+#ifdef VERBOSE
+void printData(const Data& data)
+{
+  Serial.println("-----");
+  Serial.println(data.error);
+  Serial.println(data.ts);
+  Serial.println(data.temperature);
+  Serial.println(data.humidity);
+  Serial.println(data.pressure);
+  Serial.println(data.luminosity);
+  Serial.println(data.rain);
+  Serial.println("-----");
+}
+#endif
+
 void setup()
 {
   Serial.begin(9600);
@@ -83,69 +109,69 @@ void setup()
   if (!bh1750.begin())
     return;
 
+  #ifdef VERBOSE
   Serial.println(http.configureBearer(APN));
+  #else
+  http.configureBearer(APN);
+  #endif
   
   analogReference(EXTERNAL);
   
-  Serial.println("Started!");
+  #ifdef MEMORY
+  printFreeMem();
+  #endif
 }
 
 void loop()
 {
   Data data;
-
   char response[8];
   String body;
 
   data = collectData();
 
-  Serial.println("-----");
-  Serial.println(data.error);
-  Serial.println(data.ts);
-  Serial.println(data.temperature);
-  Serial.println(data.humidity);
-  Serial.println(data.pressure);
-  Serial.println(data.luminosity);
-  Serial.println(data.rain);
-  Serial.println("-----");
-  
-//  body = dataToString(data);
+  #ifdef VERBOSE
+  printData(data);
+  #endif
+
+  #ifdef MEMORY
+  printFreeMem();
+  #endif
 
   body = dataToJsonString(data);
-
-//  StaticJsonBuffer<100> jsonBuffer;
-//  JsonObject& json = jsonBuffer.createObject();
-//  
-//  json["error"] = data.error;
-//  json["id"] = 1;
-//  json["time"] = data.time;
-//  json["temperature"] = data.temperature;
-//  json["humidity"] = data.humidity;
-//  json["pressure"] = data.pressure;
-//  json["luminosity"] = data.luminosity;
-//  json["rain"] = data.rain;
-//  
-//  json.printTo(body);
   
-//  Serial.println(body);
-//  Serial.println(body.c_str());
+  #ifdef MEMORY
+  printFreeMem();
+  #endif
   
   http.connect();
-  
+
   Result result = http.post(URL, body.c_str(), response);
+
+  #ifdef MEMORY
+  printFreeMem();
+  #endif
 
   if (result == SUCCESS)
   {
+    #ifdef VERBOSE
     Serial.print("Response: ");
     Serial.println(response);
+    #endif
   }
   else
   {
+    #ifdef VERBOSE
     Serial.print("Error:");
     Serial.println(result);
+    #endif
   }
-  
+
   http.disconnect();
+
+  #ifdef MEMORY
+  printFreeMem();
+  #endif
 
   delay(DELAY);
 }
