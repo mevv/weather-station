@@ -92,7 +92,7 @@ Result HTTP::connect() {
 
   Result result = SUCCESS;
   unsigned int attempts = 0;
-  unsigned int MAX_ATTEMPTS = 10;
+  unsigned int MAX_ATTEMPTS = 1;
 
   while (sendCmdAndWaitForResp(QUERY_BEARER, BEARER_OPEN, 2000) == FALSE && attempts < MAX_ATTEMPTS){
     attempts ++;

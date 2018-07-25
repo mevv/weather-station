@@ -10,6 +10,7 @@
 #include "error.h"
 #include "settings.h"
 #include "time.h"
+#include "ram_cache.h"
 
 #ifdef MEMORY
 #include <MemoryFree.h>
@@ -32,6 +33,8 @@ struct Data
   word luminosity = 0;
   word rain = 0;
 };
+
+RamCache<Data> cache;
 
 Data collectData()
 {
@@ -126,52 +129,54 @@ void loop()
 {
   Data data;
   char response[8];
-  String body;
+
+  #ifdef MEMORY
+  printFreeMem();
+  #endif
 
   data = collectData();
-
-  #ifdef VERBOSE
-  printData(data);
-  #endif
+  cache.push(data);
 
   #ifdef MEMORY
   printFreeMem();
   #endif
 
-  body = dataToJsonString(data);
-  
-  #ifdef MEMORY
-  printFreeMem();
-  #endif
-  
-  http.connect();
+  if (http.connect())
+      return;
 
-  Result result = http.post(URL, body.c_str(), response);
-
-  #ifdef MEMORY
-  printFreeMem();
-  #endif
-
-  if (result == SUCCESS)
+  bool flag = true;
+  while (flag)
   {
+    flag = false;
+    data = cache.pop();
+
     #ifdef VERBOSE
-    Serial.print("Response: ");
-    Serial.println(response);
+    Serial.println("Cache size: ");
+    Serial.println(cache.size());
+    printData(data);
     #endif
-  }
-  else
-  {
-    #ifdef VERBOSE
-    Serial.print("Error:");
-    Serial.println(result);
+
+    #ifdef MEMORY
+    printFreeMem();
     #endif
+
+    if (http.post(URL, dataToJsonString(data).c_str(), response) == SUCCESS)
+    {
+      #ifdef VERBOSE
+      Serial.print("Response: ");
+      Serial.println(response);
+      #endif
+      if (!cache.empty())
+          flag = true;
+    }
+    else
+    {
+      cache.push(data);
+    }
   }
 
-  http.disconnect();
-
-  #ifdef MEMORY
-  printFreeMem();
-  #endif
+  if (http.disconnect())
+      return;
 
   delay(DELAY);
 }

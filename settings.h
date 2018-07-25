@@ -5,7 +5,7 @@
 
 #define URL "http://webhook.site/a5b0af74-c7de-456e-94c6-c442e31717fb"
 
-#define DELAY 60000 // ms
+#define DELAY 1000 // ms
 
 #define TIME_SYNC_INTERVAL 10 // sec
 
@@ -25,5 +25,8 @@
 
 //GSM settings
 #define APN "internet"
+
+//RAM cache
+#define RAM_CACHE_SIZE 5
 
 #endif
