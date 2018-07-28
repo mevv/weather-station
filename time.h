@@ -17,27 +17,27 @@
 
 class GSMNTP : public SIM800
 {
-  public:
+public:
     GSMNTP(unsigned int baudRate, unsigned int rxPin, unsigned int txPin, unsigned int rstPin, bool debug = TRUE):
-      SIM800(baudRate, rxPin, txPin, rstPin, debug)
+        SIM800(baudRate, rxPin, txPin, rstPin, debug)
     {
-      setSyncInterval(TIME_SYNC_INTERVAL);
-    };
+        setSyncInterval(TIME_SYNC_INTERVAL);
+    }
 
     time_t getTimestamp()
     {
-      Serial.println("Time status: " + String(timeStatus()));
-      
-      if (timeStatus() == timeNotSet || timeStatus() == timeNeedsSync)
-        if (!syncTime())
-          return 0;
+        Serial.println("Time status: " + String(timeStatus()));
 
-      return now();
+        if (timeStatus() == timeNotSet || timeStatus() == timeNeedsSync)
+            if (!syncTime())
+                return 0;
+
+        return now();
     }
 
-    private:
-      time_t getTime()
-      {
+private:
+    time_t getTime()
+    {
         char buf[BUF];
 
         sendCmdAndWaitForResp(CPRS_TYPE, OK, 2000);
@@ -47,7 +47,7 @@ class GSMNTP : public SIM800
         sendCmdAndWaitForResp(NTP_SERVER, OK, 2000);
 
         if (!sendCmdAndWaitForResp(NTP, OK, 2000))
-          return 0;
+            return 0;
 
         sendCmd(TIME);
 
@@ -58,28 +58,28 @@ class GSMNTP : public SIM800
 
         tmElements_t tm;
         if (!parseTimeResponse(tm, buf))
-          return 0;
+            return 0;
 
         dt = (millis() - dt) / 1000;
 
         return makeTime(tm) + dt;
-      }
+    }
 
-      bool parseTimeResponse(tmElements_t& tm, const char * buf)
-      {
+    bool parseTimeResponse(tmElements_t& tm, const char * buf)
+    {
         String date;
-        
+
         for (int i = 0; i < BUF && buf[i] != '\0'; i++)
         {
-          if (buf[i] == '"')
-          {
-            i++;
-            for (int j = 0; buf[i] != '"' &&  buf[i] != '\0'; j++)
-              date += buf[i++];
-            break;
-          }
+            if (buf[i] == '"')
+            {
+                i++;
+                for (int j = 0; buf[i] != '"' && buf[i] != '\0'; j++)
+                    date += buf[i++];
+                break;
+            }
         }
-        
+
         tm.Year = date.substring(0, 2).toInt() + 2000 - 1970;
         tm.Month = date.substring(3, 5).toInt();
         tm.Day = date.substring(6, 8).toInt();
@@ -87,34 +87,23 @@ class GSMNTP : public SIM800
         tm.Minute = date.substring(12, 14).toInt();
         tm.Second = date.substring(15, 17).toInt();
 
-//        Serial.println(date);
-//
-//        Serial.println(tm.Year);
-//        Serial.println(tm.Month);
-//        Serial.println(tm.Day);
-//        Serial.println(tm.Hour);
-//        Serial.println(tm.Minute);
-//        Serial.println(tm.Second);
-
         return true;
-      }
-      
-      bool syncTime()
-      {
+    }
+
+    bool syncTime()
+    {
         time_t t = 0;
-        
+
         if (!(t = getTime()))
-          return false;
+            return false;
 
         if (t < MIN_TIMESTAMP)
-          return false;
+            return false;
 
         setTime(t);
 
-        //Serial.println("Time synced, timestamp: " + String(now()));
-
         return true;
-      }
+    }
 };
 
 #endif

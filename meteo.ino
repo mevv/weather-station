@@ -25,59 +25,59 @@ GSMNTP gsmntp(9600, RX_PIN, TX_PIN, RST_PIN, true);
 
 struct Data
 {
-  byte error = 0;
-  time_t ts = 0;
-  byte temperature = 0;
-  byte humidity = 0;
-  word pressure = 0;
-  word luminosity = 0;
-  word rain = 0;
+    byte error = 0;
+    time_t ts = 0;
+    byte temperature = 0;
+    byte humidity = 0;
+    word pressure = 0;
+    word luminosity = 0;
+    word rain = 0;
 };
 
 RamCache<Data> cache;
 
 Data collectData()
 {
-  Data result;
-  
-  byte status;
-  byte err = 0;
-  double T = 0.0;
-  double P = 0.0;
-  
-  if (!(result.ts = gsmntp.getTimestamp()))
-    result.error = TIME_SYNC_ERROR;
-  
-  if ((err = dht22.read(DHT22_PIN, &result.temperature, &result.humidity, NULL)) != SimpleDHTErrSuccess)
-    if (!result.error)
-      result.error = err;
+    Data result;
 
-  status = bmp180.startTemperature();
-  if (!status)
-    if (!result.error)
-      result.error = bmp180.getError();
-  delay(status);
-  status = bmp180.getTemperature(T);
+    byte status;
+    byte err = 0;
+    double T = 0.0;
+    double P = 0.0;
 
-  status = bmp180.startPressure(PRESSURE_RESOLUTION);
-  if (!status)
-    if (!result.error)
-      result.error = bmp180.getError();
-  delay(status);
-  status = bmp180.getPressure(P, T);
+    if (!(result.ts = gsmntp.getTimestamp()))
+        result.error = TIME_SYNC_ERROR;
 
-  result.pressure = P;
+    if ((err = dht22.read(DHT22_PIN, &result.temperature, &result.humidity, NULL)) != SimpleDHTErrSuccess)
+        if (!result.error)
+            result.error = err;
 
-  result.luminosity = bh1750.readLightLevel();
+    status = bmp180.startTemperature();
+    if (!status)
+        if (!result.error)
+            result.error = bmp180.getError();
+    delay(status);
+    status = bmp180.getTemperature(T);
 
-  result.rain = analogRead(RAIN_PIN);
+    status = bmp180.startPressure(PRESSURE_RESOLUTION);
+    if (!status)
+        if (!result.error)
+            result.error = bmp180.getError();
+    delay(status);
+    status = bmp180.getPressure(P, T);
 
-  return result;
+    result.pressure = P;
+
+    result.luminosity = bh1750.readLightLevel();
+
+    result.rain = analogRead(RAIN_PIN);
+
+    return result;
 }
 
 String dataToJsonString(const Data& data)
 {
-  return "{\"e\": " + String(data.error) + ", \"id\": " + String(ID) + ", \"ts\": " + String(data.ts) + ", \"t\": " + String(data.temperature) + ", \"h\": " + String(data.humidity) + ", \"p\": " + String(data.pressure) + ", \"l\": " + String(data.luminosity) + ", \"r\": " + String(data.rain) + "}";
+    return "{\"e\": " + String(data.error) + ", \"id\": " + String(ID) + ", \"ts\": " + String(data.ts) + ", \"t\": " + String(data.temperature) + ", \"h\": " + String(data.humidity) + ", \"p\": " + String(data.pressure) + ", \"l\": " + String(data.luminosity) + ", \"r\": " + String(data.rain) + "}";
 }
 
 #ifdef MEMORY
@@ -90,93 +90,93 @@ void printFreeMem()
 #ifdef VERBOSE
 void printData(const Data& data)
 {
-  Serial.println("-----");
-  Serial.println(data.error);
-  Serial.println(data.ts);
-  Serial.println(data.temperature);
-  Serial.println(data.humidity);
-  Serial.println(data.pressure);
-  Serial.println(data.luminosity);
-  Serial.println(data.rain);
-  Serial.println("-----");
+    Serial.println("-----");
+    Serial.println(data.error);
+    Serial.println(data.ts);
+    Serial.println(data.temperature);
+    Serial.println(data.humidity);
+    Serial.println(data.pressure);
+    Serial.println(data.luminosity);
+    Serial.println(data.rain);
+    Serial.println("-----");
 }
 #endif
 
 void setup()
 {
-  Serial.begin(9600);
+    Serial.begin(9600);
 
-  if (!bmp180.begin())
-    return;
+    if (!bmp180.begin())
+        return;
 
-  if (!bh1750.begin())
-    return;
+    if (!bh1750.begin())
+        return;
 
-  #ifdef VERBOSE
-  Serial.println(http.configureBearer(APN));
-  #else
-  http.configureBearer(APN);
-  #endif
-  
-  analogReference(EXTERNAL);
-  
-  #ifdef MEMORY
-  printFreeMem();
-  #endif
+    #ifdef VERBOSE
+    Serial.println(http.configureBearer(APN));
+    #else
+    http.configureBearer(APN);
+    #endif
+
+    analogReference(EXTERNAL);
+
+    #ifdef MEMORY
+    printFreeMem();
+    #endif
 }
 
 void loop()
 {
-  Data data;
-  char response[8];
-
-  #ifdef MEMORY
-  printFreeMem();
-  #endif
-
-  data = collectData();
-  cache.push(data);
-
-  #ifdef MEMORY
-  printFreeMem();
-  #endif
-
-  if (http.connect())
-      return;
-
-  bool flag = true;
-  while (flag)
-  {
-    flag = false;
-    data = cache.pop();
-
-    #ifdef VERBOSE
-    Serial.println("Cache size: ");
-    Serial.println(cache.size());
-    printData(data);
-    #endif
+    Data data;
+    char response[8];
 
     #ifdef MEMORY
     printFreeMem();
     #endif
 
-    if (http.post(URL, dataToJsonString(data).c_str(), response) == SUCCESS)
-    {
-      #ifdef VERBOSE
-      Serial.print("Response: ");
-      Serial.println(response);
-      #endif
-      if (!cache.empty())
-          flag = true;
-    }
-    else
-    {
-      cache.push(data);
-    }
-  }
+    data = collectData();
+    cache.push(data);
 
-  if (http.disconnect())
-      return;
+    #ifdef MEMORY
+    printFreeMem();
+    #endif
 
-  delay(DELAY);
+    if (http.connect())
+        return;
+
+    bool flag = true;
+    while (flag)
+    {
+        flag = false;
+        data = cache.pop();
+
+        #ifdef VERBOSE
+        Serial.println("Cache size: ");
+        Serial.println(cache.size());
+        printData(data);
+        #endif
+
+        #ifdef MEMORY
+        printFreeMem();
+        #endif
+
+        if (http.post(URL, dataToJsonString(data).c_str(), response) == SUCCESS)
+        {
+            #ifdef VERBOSE
+            Serial.print("Response: ");
+            Serial.println(response);
+            #endif
+            if (!cache.empty())
+                flag = true;
+        }
+        else
+        {
+            cache.push(data);
+        }
+    }
+
+    if (http.disconnect())
+        return;
+
+    delay(DELAY);
 }
