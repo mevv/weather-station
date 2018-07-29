@@ -20,8 +20,14 @@ SimpleDHT dht22;
 SFE_BMP180 bmp180;
 BH1750 bh1750;
 
-HTTP http(9600, RX_PIN, TX_PIN, RST_PIN, true);
-GSMNTP gsmntp(9600, RX_PIN, TX_PIN, RST_PIN, true);
+#ifdef VERBOSE
+bool debug = true;
+#else
+bool debug = false;
+#endif
+
+HTTP http(9600, RX_PIN, TX_PIN, RST_PIN, debug);
+GSMNTP gsmntp(9600, RX_PIN, TX_PIN, RST_PIN, debug);
 
 struct Data
 {
@@ -83,7 +89,7 @@ String dataToJsonString(const Data& data)
 #ifdef MEMORY
 void printFreeMem()
 {
-    Serial.println(String("Memory:" + String(freeMemory())));
+    Serial.println(String("Memory: " + String(freeMemory())));
 }
 #endif
 
@@ -112,17 +118,9 @@ void setup()
     if (!bh1750.begin())
         return;
 
-    #ifdef VERBOSE
-    Serial.println(http.configureBearer(APN));
-    #else
     http.configureBearer(APN);
-    #endif
 
     analogReference(EXTERNAL);
-
-    #ifdef MEMORY
-    printFreeMem();
-    #endif
 }
 
 void loop()

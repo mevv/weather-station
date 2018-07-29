@@ -18,7 +18,7 @@
 class GSMNTP : public SIM800
 {
 public:
-    GSMNTP(unsigned int baudRate, unsigned int rxPin, unsigned int txPin, unsigned int rstPin, bool debug = TRUE):
+    GSMNTP(unsigned int baudRate, unsigned int rxPin, unsigned int txPin, unsigned int rstPin, bool debug = TRUE) :
         SIM800(baudRate, rxPin, txPin, rstPin, debug)
     {
         setSyncInterval(TIME_SYNC_INTERVAL);
@@ -26,7 +26,9 @@ public:
 
     time_t getTimestamp()
     {
+        #ifdef VERBOSE
         Serial.println("Time status: " + String(timeStatus()));
+        #endif
 
         if (timeStatus() == timeNotSet || timeStatus() == timeNeedsSync)
             if (!syncTime())
@@ -94,7 +96,9 @@ private:
     {
         time_t t = 0;
 
-        if (!(t = getTime()))
+        t = getTime();
+
+        if (!t)
             return false;
 
         if (t < MIN_TIMESTAMP)

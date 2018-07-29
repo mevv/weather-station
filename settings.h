@@ -7,26 +7,26 @@
 
 #define DELAY 60000 // ms
 
-#define TIME_SYNC_INTERVAL 10 // sec
+#define TIME_SYNC_INTERVAL 300 // sec
 
-#define MIN_TIMESTAMP 1514764800 //2018-01-01 00:00:00
+#define MIN_TIMESTAMP 1514764800 // 2018-01-01 00:00:00
 
-//digital pins
+// digital pins
 #define DHT22_PIN 2
 #define PRESSURE_RESOLUTION 3
 
-//analog pins
+// analog pins
 #define RAIN_PIN 0
 
-//GSM pinout
+// GSM pinout
 #define RX_PIN 9
 #define TX_PIN 8
 #define RST_PIN 10
 
-//GSM settings
+// GSM settings
 #define APN "internet"
 
-//RAM cache
-#define RAM_CACHE_SIZE 5
+// RAM cache
+#define RAM_CACHE_SIZE 10
 
 #endif
