@@ -9,7 +9,7 @@
 
 #include "error.h"
 #include "settings.h"
-#include "time.h"
+#include "gsm_ntp.h"
 #include "ram_cache.h"
 
 #ifdef MEMORY

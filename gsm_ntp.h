@@ -1,5 +1,5 @@
-#ifndef _TIME_H_
-#define _TIME_H_
+#ifndef _GSM_NTP_H_
+#define _GSM_NTP_H_
 
 #include <TimeLib.h>
 
